@@ -7,11 +7,17 @@ namespace DropBox
 {
     public class Startup
     {
+        private readonly IHostingEnvironment _env;
+
+        public Startup(IHostingEnvironment env)
+        {
+            _env = env;
+        }
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddLiteDb(_env.ContentRootPath+ "/bug.litedb");
             services.AddMvc();
-            services.AddLiteDb(@"bug.litedb");
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -22,7 +28,7 @@ namespace DropBox
             }
 
             app.UseStaticFiles();
-            app.UseMvc();
+            app.UseMvcWithDefaultRoute();
         }
     }
 }
