@@ -1,0 +1,54 @@
+﻿
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+<hr />
+
+<form enctype="multipart/form-data" method="post">
+    <input type="file" name="file" id="file" />
+    <button class="btn btn-primary" id="upload">Upload</button>
+</form>
+
+<output id="list"></output>
+
+<h2 id="percent">0%</h2>
+
+@section scripts{
+    <script>
+        var files = null;
+
+        function handleFileSelect(evt) {
+            files = evt.target.files; // FileList object
+
+            var output = [];
+            for (var i = 0, f; f = files[i]; i++) {
+                output.push('<li><strong>', escape(f.name), '</strong> (', f.type || 'n/a', ') - ',
+                    f.size, ' bytes </li>');
+            }
+            document.getElementById('list').innerHTML = '<ul>' + output.join('') + '</ul>';
+        }
+
+        document.getElementById('file').addEventListener('change', handleFileSelect, false);
+
+        $("#upload").click(function (e) {
+
+            var progressUpdates = setInterval(function () {
+                $.post("/upload/progress", function (progress) {
+                    console.log(progress);
+                    $("#percent").text(progress+"%");
+                    if (progress >= 100) {
+                        clearInterval(progressUpdates);
+                    }
+                });
+            }, 200);
+
+           
+
+        });
+
+
+
+    </script>
+}
