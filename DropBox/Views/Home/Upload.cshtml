@@ -16,7 +16,20 @@
 <h2 id="percent">0%</h2>
 
 @section scripts{
+    <script src="~/lib/signalr/dist/browser/signalr.js"></script>
     <script>
+        var connection = new signalR.HubConnectionBuilder().withUrl("/notifyhub").build();
+        connection.on("receiveProgress", function (progress) {
+            console.log(progress);
+
+            if (progress >= 100) {
+                connection.stop();
+            }
+            $("#percent").text(progress + "%");
+        });
+
+        connection.start();
+
         var files = null;
 
         function handleFileSelect(evt) {
@@ -34,21 +47,16 @@
 
         $("#upload").click(function (e) {
 
-            var progressUpdates = setInterval(function () {
-                $.post("/upload/progress", function (progress) {
-                    console.log(progress);
-                    $("#percent").text(progress+"%");
-                    if (progress >= 100) {
-                        clearInterval(progressUpdates);
-                    }
-                });
-            }, 200);
 
-           
+            connection.invoke("SendProgress", 0);
+
 
         });
 
 
 
+
     </script>
+
+
 }

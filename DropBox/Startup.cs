@@ -16,6 +16,7 @@ namespace DropBox
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSignalR();
             services.AddLiteDb(_env.ContentRootPath+ "/bug.litedb");
             services.AddMvc();
         }
@@ -26,7 +27,10 @@ namespace DropBox
             {
                 app.UseDeveloperExceptionPage();
             }
-
+            app.UseSignalR(routes =>
+            {
+                routes.MapHub<NotifyHub>("/notifyhub");
+            });
             app.UseStaticFiles();
             app.UseMvcWithDefaultRoute();
         }

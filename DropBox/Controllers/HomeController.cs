@@ -7,16 +7,18 @@ using DropBox.Common;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 
 namespace DropBox.Controllers
 {
     public class HomeController : Controller
     {
         private readonly LiteDbContext _db;
-
-        public HomeController(LiteDbContext db)
+        private readonly IHubContext<NotifyHub> _notifyHub;
+        public HomeController(LiteDbContext db, IHubContext<NotifyHub> notifyHub)
         {
             _db = db;
+            _notifyHub = notifyHub;
         }
 
         [Route("/")]
@@ -85,7 +87,7 @@ namespace DropBox.Controllers
                         await output.WriteAsync(buffer, 0, readBytes);
                         totalReadBytes += readBytes;
                         Progress = (int)((float)totalReadBytes / (float)totalBytes * 100.0);
-
+                        await _notifyHub.Clients.All.SendAsync("receiveProgress", Progress);
                         await Task.Delay(100); // It is only to make the process slower
                     }
                 }
