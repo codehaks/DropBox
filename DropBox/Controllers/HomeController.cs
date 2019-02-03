@@ -69,6 +69,7 @@ namespace DropBox.Controllers
         public static int Progress { get; set; }
 
         [HttpPost]
+        [Route("api/upload")]
         public async Task<IActionResult> Upload(IFormFile file,[FromServices] IHostingEnvironment env)
         {
             byte[] buffer = new byte[16 * 1024];
@@ -92,7 +93,7 @@ namespace DropBox.Controllers
                     }
                 }
             }
-            return View();
+            return Ok();
         }
 
         [Route("upload/progress")]

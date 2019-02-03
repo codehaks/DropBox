@@ -22,15 +22,19 @@
         connection.on("receiveProgress", function (progress) {
             console.log(progress);
 
-            if (progress >= 100) {
-                connection.stop();
-            }
+            //if (progress >= 100) {
+            //    connection.stop();
+            //}
             $("#percent").text(progress + "%");
         });
 
-        connection.start();
+        connection.start().catch(function (err) {
+            return console.error(err.toString());
+        });
 
         var files = null;
+
+        var data = new FormData();
 
         function handleFileSelect(evt) {
             files = evt.target.files; // FileList object
@@ -41,15 +45,28 @@
                     f.size, ' bytes </li>');
             }
             document.getElementById('list').innerHTML = '<ul>' + output.join('') + '</ul>';
+
+            $.each(files, function (key, value) {
+                data.append(key, value);
+            });
+
         }
 
         document.getElementById('file').addEventListener('change', handleFileSelect, false);
 
         $("#upload").click(function (e) {
+            e.preventDefault();
 
-
-            connection.invoke("SendProgress", 0);
-
+            $.ajax({
+                url: '/api/upload',
+                type: "POST",
+                processData: false,
+                contentType: false,
+                data: { file: data }
+            }).done(function () {
+                     
+                console.log("done");
+                    });
 
         });
 
