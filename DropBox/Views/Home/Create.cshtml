@@ -1,13 +1,35 @@
-﻿
-@{
+﻿@{
     ViewData["Title"] = "Create";
 }
 
-<h1>Create</h1>
+<h1>Upload</h1>
 <hr />
 
-<form enctype="multipart/form-data" method="post">
-    <input type="file" name="file"/>
+<form enctype="multipart/form-data" method="post" id="upload">
+    <input type="file" name="file" />
     <button class="btn btn-primary">Upload</button>
 </form>
 
+@section scripts{
+
+<script>
+    $(document).on('submit', '#upload', function (e) {
+        e.preventDefault();
+
+        var form_data = new FormData($('#upload')[0]);
+        $.ajax({
+            type: 'POST',
+            url: '/api/upload',
+            processData: false,
+            contentType: false,
+            async: false,
+            cache: false,
+            data: form_data,
+            success: function (response) {
+                console.log("Uploaded.");
+            }
+        });
+    });
+</script>
+
+}

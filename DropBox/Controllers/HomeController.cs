@@ -47,6 +47,22 @@ namespace DropBox.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [HttpPost]
+        [Route("api/upload")]
+        public IActionResult Upload(IFormFile file)
+        {
+            if (file.Length > 0)
+            {
+                using (var stream = new MemoryStream())
+                {
+                    file.CopyTo(stream);
+                    stream.Position = 0;
+                    _db.Context.FileStorage.Upload(file.FileName, file.FileName, stream);
+                }
+            }
+            return RedirectToAction(nameof(Index));
+        }
+
         public IActionResult Details(string id)
         {
             var model = _db.Context.FileStorage.FindById(id);
