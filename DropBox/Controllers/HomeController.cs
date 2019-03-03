@@ -60,7 +60,8 @@ namespace DropBox.Controllers
                     _db.Context.FileStorage.Upload(file.FileName, file.FileName, stream);
                 }
             }
-            return RedirectToAction(nameof(Index));
+            //return RedirectToAction(nameof(Index));
+            return Ok("Done");
         }
 
         public IActionResult Details(string id)

@@ -5,31 +5,50 @@
 <h1>Upload</h1>
 <hr />
 
-<form enctype="multipart/form-data" method="post" id="upload">
-    <input type="file" name="file" />
-    <button class="btn btn-primary">Upload</button>
-</form>
+
+<input type="file" name="file" id="upload" />
+<button class="btn btn-primary">Upload</button>
+
+<div id="files" class="files"></div>
+
+<div id="progress" class="progress">
+    <div class="progress-bar progress-bar-success"></div>
+</div>
 
 @section scripts{
-
+<script src="~/lib/jQuery-File-Upload/js/vendor/jquery.ui.widget.js"></script>
+<script src="~/lib/jQuery-File-Upload/js/jquery.iframe-transport.js"></script>
+<script src="~/lib/jQuery-File-Upload/js/jquery.fileupload.js"></script>
 <script>
-    $(document).on('submit', '#upload', function (e) {
-        e.preventDefault();
 
-        var form_data = new FormData($('#upload')[0]);
-        $.ajax({
-            type: 'POST',
-            url: '/api/upload',
-            processData: false,
-            contentType: false,
-            async: false,
-            cache: false,
-            data: form_data,
-            success: function (response) {
-                console.log("Uploaded.");
-            }
-        });
+    $(function () {
+        'use strict';
+
+        var url = '/api/upload';
+
+        $('#upload').fileupload(
+            {
+                maxChunkSize: 100000,
+                url: url,
+                //dataType: 'json',
+                done: function (e, data) {
+                    $.each(data.result.files, function (index, file) {
+                        $('<p/>').text(file.name).appendTo('#files');
+                    });
+                },
+                progressall: function (e, data) {
+                    var progress = parseInt(data.loaded / data.total * 100, 10);
+                    $('#progress .progress-bar').css(
+                        'width',
+                        progress + '%'
+                    );
+                }
+            })
+            .prop('disabled', !$.support.fileInput)
+            .parent().addClass($.support.fileInput ? undefined : 'disabled');
     });
 </script>
+
+
 
 }
