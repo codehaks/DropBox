@@ -33,28 +33,23 @@ namespace DropBox.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(IFormFile file)
+        public IActionResult Create(string imageFile)
         {
-            if (file.Length > 0)
+            //remove "data:image/png;base64,"
+            var base64 = imageFile.Split(",")[1];
+
+            byte[] data = Convert.FromBase64String(base64);
+            using (var stream = new MemoryStream(data, 0, data.Length))
             {
-                using(var stream=new MemoryStream())
-                {
-                    file.CopyTo(stream);
-                    stream.Position = 0;
-                    _db.Context.FileStorage.Upload(file.FileName, file.FileName, stream);
-                }  
+
+                stream.Position = 0;
+                _db.Context.FileStorage.Upload("pic.png", "pic.png", stream);
             }
+
             return RedirectToAction(nameof(Index));
         }
 
-//        byte[] data = Convert.FromBase64String(base64String);
-//using(var stream = new MemoryStream(data, 0, data.Length))
-//{
-//  Image image = Image.FromStream(stream);
-//    //TODO: do something with image
-//}
-
-public IActionResult Details(string id)
+        public IActionResult Details(string id)
         {
             var model = _db.Context.FileStorage.FindById(id);
             var memory = new MemoryStream();
@@ -62,7 +57,7 @@ public IActionResult Details(string id)
             model.CopyTo(memory);
             memory.Position = 0;
 
-            return new FileStreamResult(memory,model.MimeType);
+            return new FileStreamResult(memory, model.MimeType);
         }
     }
 }

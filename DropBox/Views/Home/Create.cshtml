@@ -30,6 +30,7 @@
 
     <div id="result"></div>
 
+    <input type="text" name="imageFile" hidden id="imageContent" />
 
 </form>
 
@@ -62,10 +63,15 @@
                             // Get a string base 64 data url
                             e.preventDefault()
                             var croppedImageDataURL = cropper.getCroppedCanvas().toDataURL("image/png");
-                            var myImage = new Image();
-                            myImage.src = croppedImageDataURL;
-                            context.drawImage(myImage, 0, 0);
-                            $result.append($('<img>').attr('src', croppedImageDataURL));
+                            console.log(croppedImageDataURL);
+                            $("#imageContent").val(croppedImageDataURL);
+                            //var myImage = new Image();
+                            //myImage.src = croppedImageDataURL;
+                            //context.fillRect(0, 0, 300, 150);
+                            //context.clearRect(0, 0, canvas.width, canvas.height);
+                            //debugger
+                            //context.drawImage(myImage, 0, 0);
+                            //$result.append($('<img>').attr('src', croppedImageDataURL));
                         });
                         $('#btnRestore').click(function (e) {
                             e.preventDefault();
