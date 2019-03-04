@@ -20,7 +20,8 @@
 }
 <form enctype="multipart/form-data" method="post">
     <input type="file" name="file" id="fileInput" accept="image/*" />
-
+    <button id="btnCrop">Crop</button>
+    <button class="btn btn-primary">Upload</button>
     <div>
         <canvas id="canvas">
             Your browser does not support the HTML5 canvas element.
@@ -29,8 +30,7 @@
 
     <div id="result"></div>
 
-    <button id="btnCrop">Crop</button>
-    <button class="btn btn-primary">Upload</button>
+
 </form>
 
 @section scripts{
@@ -62,6 +62,9 @@
                             // Get a string base 64 data url
                             e.preventDefault()
                             var croppedImageDataURL = cropper.getCroppedCanvas().toDataURL("image/png");
+                            var myImage = new Image();
+                            myImage.src = croppedImageDataURL;
+                            context.drawImage(myImage, 0, 0);
                             $result.append($('<img>').attr('src', croppedImageDataURL));
                         });
                         $('#btnRestore').click(function (e) {
