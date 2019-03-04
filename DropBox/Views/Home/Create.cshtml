@@ -13,8 +13,6 @@
         }
 
         #canvas {
-            height: 600px;
-            width: 600px;
             background-color: #ffffff;
             cursor: default;
             border: 1px solid black;
@@ -48,11 +46,13 @@
                     var reader = new FileReader();
                     reader.onload = function (evt) {
                         var img = new Image();
+                        const canv = document.getElementById('canvas');
+
                         img.onload = function () {
                             context.canvas.height = img.height;
                             context.canvas.width = img.width;
                             context.drawImage(img, 0, 0);
-                            var cropper = canvas.cropper({
+                            var cropper = new Cropper(canv,{
                                 aspectRatio: 16 / 9
                             });
                             $('#btnCrop').click(function () {
