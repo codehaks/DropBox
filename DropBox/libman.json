@@ -13,6 +13,10 @@
     {
       "library": "vue@2.5.17",
       "destination": "wwwroot/lib/vue/"
+    },
+    {
+      "library": "cropperjs@1.4.3",
+      "destination": "wwwroot/lib/cropperjs/"
     }
   ]
 }

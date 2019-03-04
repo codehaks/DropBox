@@ -47,7 +47,14 @@ namespace DropBox.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        public IActionResult Details(string id)
+//        byte[] data = Convert.FromBase64String(base64String);
+//using(var stream = new MemoryStream(data, 0, data.Length))
+//{
+//  Image image = Image.FromStream(stream);
+//    //TODO: do something with image
+//}
+
+public IActionResult Details(string id)
         {
             var model = _db.Context.FileStorage.FindById(id);
             var memory = new MemoryStream();
