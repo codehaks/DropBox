@@ -57,5 +57,20 @@ namespace DropBox.Controllers
 
             return new FileStreamResult(memory,model.MimeType);
         }
+
+        [HttpGet]
+        public IActionResult Delete(string id)
+        {
+            var fileInfo= _db.Context.FileStorage.FindById(id);
+            return View(fileInfo);
+        }
+
+        [HttpPost]
+        public IActionResult DeleteFile(string id)
+        {
+            //var fileInfo = _db.Context.FileStorage.FindById(id);
+            _db.Context.FileStorage.Delete(id);
+            return RedirectToAction(nameof(Index));
+        }
     }
 }

@@ -1,0 +1,17 @@
+﻿@model LiteDB.LiteFileInfo
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h1>Delete</h1>
+<hr />
+<p class="font-weight-bold">Are you sure?</p>
+<form asp-action="DeleteFile" asp-controller="Home" method="post">
+
+    <p>@Model.Filename</p>
+    <input hidden asp-for="Id" />
+    <button class="btn btn-primary">Delete</button>
+    <a asp-action="Index" asp-controller="Home" class="btn btn-link">Back to list</a>
+
+</form>
+

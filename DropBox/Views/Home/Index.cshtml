@@ -1,16 +1,25 @@
 ﻿@using LiteDB
-@model  IEnumerable<LiteFileInfo>
+@model IEnumerable<LiteFileInfo>
 @{
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
-
-<a class="btn btn-success" asp-action="create">Create</a>
+<h1>DropBox</h1>
 <hr />
+<a class="btn btn-success m-3" asp-action="create">Upload</a>
+<table class="table">
+    @foreach (var file in Model)
+    {
+        <tr>
+            <td><a asp-action="details" asp-route-id="@file.Id">@file.Filename</a></td>
+            <td>@(file.Length / 1024) KB</td>
+            <td>
+                @*<a asp-action="delete" asp-route-id="@file.Id" class="btn btn-danger">Download</a>*@
+                <a asp-action="delete" asp-route-id="@file.Id" class="btn btn-danger">Delete</a>
+            </td>
+        </tr>
+    }
+</table>
 
-@foreach (var file in Model)
-{
-    <p><a asp-action="details" asp-route-id="@file.Id">@file.Filename (@file.Length)</a> </p>
-}
+
 
