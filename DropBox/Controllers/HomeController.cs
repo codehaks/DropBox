@@ -2,20 +2,23 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using DropBox.Common;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace DropBox.Controllers
 {
     public class HomeController : Controller
     {
         private readonly LiteDbContext _db;
-
-        public HomeController(LiteDbContext db)
+        private readonly ILogger _logger;
+        public HomeController(LiteDbContext db, ILogger<HomeController> logger)
         {
             _db = db;
+            _logger = logger;
         }
 
         [Route("/")]
@@ -56,19 +59,26 @@ namespace DropBox.Controllers
         [HttpPost]
         public IActionResult CreateMany(IList<IFormFile> files)
         {
-            foreach (var file in files)
+            var totalSize = 0L;
+
+            Parallel.For(0, files.Count, (index) =>
             {
+                var file = files[index];
+                Thread.Sleep(3000);
                 if (file.Length > 0)
                 {
                     using (var stream = new MemoryStream())
                     {
                         file.CopyTo(stream);
+                        totalSize += file.Length;
                         stream.Position = 0;
                         _db.Context.FileStorage.Upload(file.FileName, file.FileName, stream);
                     }
                 }
-            }
-           
+            });
+
+            _logger.LogWarning($" Total upload size : {totalSize}");
+
             return RedirectToAction(nameof(Index));
         }
 
