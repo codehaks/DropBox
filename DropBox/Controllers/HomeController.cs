@@ -71,6 +71,7 @@ namespace DropBox.Controllers
                     {
                         file.CopyTo(stream);
                         totalSize += file.Length;
+                        //Interlocked.Add(ref totalSize, file.Length);
                         stream.Position = 0;
                         _db.Context.FileStorage.Upload(file.FileName, file.FileName, stream);
                     }
