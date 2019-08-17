@@ -1,6 +1,7 @@
 ﻿using DropBox.Common;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DropBox
@@ -18,6 +19,12 @@ namespace DropBox
         {
             services.AddLiteDb(_env.ContentRootPath+ "/bug.litedb");
             services.AddMvc();
+
+            services.Configure<FormOptions>(x =>
+            {
+                x.ValueLengthLimit = int.MaxValue;
+                x.MultipartBodyLengthLimit = int.MaxValue; // In case of multipart
+            });
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)

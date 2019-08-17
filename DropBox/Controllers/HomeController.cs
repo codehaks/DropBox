@@ -33,6 +33,8 @@ namespace DropBox.Controllers
         }
 
         [HttpPost]
+        [RequestSizeLimit(1_000_000_000)]
+        [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
         public IActionResult Create(IFormFile file)
         {
             if (file.Length > 0)
