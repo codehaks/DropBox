@@ -18,13 +18,7 @@ namespace DropBox
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddLiteDb(_env.ContentRootPath+ "/bug.litedb");
-            services.AddMvc();
-
-            services.Configure<FormOptions>(x =>
-            {
-                x.ValueLengthLimit = int.MaxValue;
-                x.MultipartBodyLengthLimit = int.MaxValue; // In case of multipart
-            });
+            services.AddMvc();          
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
