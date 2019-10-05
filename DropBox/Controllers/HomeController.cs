@@ -57,26 +57,50 @@ namespace DropBox.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateMany(IList<IFormFile> files)
+        public async Task<IActionResult> CreateMany(IList<IFormFile> files)
         {
             var totalSize = 0L;
-
-            Parallel.For(0, files.Count, (index) =>
+            var uploadTaskList = new List<Task>();
+            foreach (var file in files)
             {
-                var file = files[index];
-                Thread.Sleep(3000);
-                if (file.Length > 0)
+               var uploadTask= Task.Run(() =>
                 {
-                    using (var stream = new MemoryStream())
+                    Thread.Sleep(3000);
+                    if (file.Length > 0)
                     {
-                        file.CopyTo(stream);
-                        totalSize += file.Length;
-                        //Interlocked.Add(ref totalSize, file.Length);
-                        stream.Position = 0;
-                        _db.Context.FileStorage.Upload(file.FileName, file.FileName, stream);
+                        using (var stream = new MemoryStream())
+                        {
+                            file.CopyTo(stream);
+                            totalSize += file.Length;
+                            //Interlocked.Add(ref totalSize, file.Length);
+                            stream.Position = 0;
+                            _db.Context.FileStorage.Upload(file.FileName, file.FileName, stream);
+                        }
                     }
-                }
-            });
+                });
+
+                uploadTaskList.Add(uploadTask);
+            }
+
+            await Task.WhenAll(uploadTaskList);
+           
+
+            //Parallel.For(0, files.Count, (index) =>
+            //{
+            //    var file = files[index];
+            //    Thread.Sleep(3000);
+            //    if (file.Length > 0)
+            //    {
+            //        using (var stream = new MemoryStream())
+            //        {
+            //            file.CopyTo(stream);
+            //            totalSize += file.Length;
+            //            //Interlocked.Add(ref totalSize, file.Length);
+            //            stream.Position = 0;
+            //            _db.Context.FileStorage.Upload(file.FileName, file.FileName, stream);
+            //        }
+            //    }
+            //});
 
             _logger.LogWarning($" Total upload size : {totalSize}");
 
