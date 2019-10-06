@@ -4,12 +4,13 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<h1>DropBox</h1>
 
-<a class="btn btn-success" asp-action="create">Create</a>
-<a class="btn btn-success" asp-action="upload">Upload</a>
+<a class="btn btn-success" asp-action="create">Simple Upload to LiteDb</a>
+<a class="btn btn-success" asp-action="upload">Upload with progress</a>
 <hr />
 
+<h2>Files in LiteDb</h2>
 @foreach (var file in Model)
 {
     <p><a asp-action="details" asp-route-id="@file.Id">@file.Filename (@file.Length)</a> </p>

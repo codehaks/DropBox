@@ -68,7 +68,6 @@ namespace DropBox.Controllers
         {
             return View();
         }
-        //public static int Progress { get; set; }
 
         [HttpPost]
         public async Task<IActionResult> Upload(IFormFile file,[FromServices] IHostingEnvironment env)
@@ -90,20 +89,16 @@ namespace DropBox.Controllers
                         totalReadBytes += readBytes;
                         progress = (int)((float)totalReadBytes / (float)totalBytes * 100.0);
 
-                        _uploadHub.Clients.All.SendProgress(progress);
+                        await _uploadHub.Clients.All.SendProgress(progress);
                         
 
-                        await Task.Delay(100); // It is only to make the process slower
+                        await Task.Delay(50); // It is only to make the process slower
                     }
                 }
             }
             return View();
         }
 
-        //[Route("upload/progress")]
-        //public IActionResult GetProressStatus()
-        //{
-        //    return Ok(Progress);
-        //}
+      
     }
 }

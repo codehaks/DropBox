@@ -17,7 +17,7 @@ namespace DropBox
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddLiteDb(_env.ContentRootPath+ "/bug.litedb");
+            services.AddLiteDb(_env.ContentRootPath+ "/myfiles.litedb");
             services.AddSignalR();
             services.AddMvc();
         }
