@@ -1,4 +1,5 @@
 ﻿using DropBox.Common;
+using DropBox.Hubs;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,6 +18,7 @@ namespace DropBox
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddLiteDb(_env.ContentRootPath+ "/bug.litedb");
+            services.AddSignalR();
             services.AddMvc();
         }
 
@@ -28,6 +30,11 @@ namespace DropBox
             }
 
             app.UseStaticFiles();
+            app.UseSignalR(routes =>
+            {
+                routes.MapHub<UploadHub>("/uploadhub");
+                //routes.MapHub<StatusHub>("/statusHub");
+            });
             app.UseMvcWithDefaultRoute();
         }
     }

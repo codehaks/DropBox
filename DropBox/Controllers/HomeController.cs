@@ -4,19 +4,23 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using DropBox.Common;
+using DropBox.Hubs;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 
 namespace DropBox.Controllers
 {
     public class HomeController : Controller
     {
         private readonly LiteDbContext _db;
+        private readonly IHubContext<UploadHub, IUploadHub> _uploadHub;
 
-        public HomeController(LiteDbContext db)
+        public HomeController(LiteDbContext db, IHubContext<UploadHub, IUploadHub> uploadHub)
         {
             _db = db;
+            _uploadHub = uploadHub;
         }
 
         [Route("/")]
@@ -64,14 +68,14 @@ namespace DropBox.Controllers
         {
             return View();
         }
-        public static int Progress { get; set; }
+        //public static int Progress { get; set; }
 
         [HttpPost]
         public async Task<IActionResult> Upload(IFormFile file,[FromServices] IHostingEnvironment env)
         {
             byte[] buffer = new byte[16 * 1024];
             long totalBytes = file.Length;
-            Progress = 0;
+            var progress = 0;
 
             using (FileStream output = System.IO.File.Create(env.ContentRootPath + "/files/" + file.FileName))
             {
@@ -84,7 +88,10 @@ namespace DropBox.Controllers
                     {
                         await output.WriteAsync(buffer, 0, readBytes);
                         totalReadBytes += readBytes;
-                        Progress = (int)((float)totalReadBytes / (float)totalBytes * 100.0);
+                        progress = (int)((float)totalReadBytes / (float)totalBytes * 100.0);
+
+                        _uploadHub.Clients.All.SendProgress(progress);
+                        
 
                         await Task.Delay(100); // It is only to make the process slower
                     }
@@ -93,10 +100,10 @@ namespace DropBox.Controllers
             return View();
         }
 
-        [Route("upload/progress")]
-        public IActionResult GetProressStatus()
-        {
-            return Ok(Progress);
-        }
+        //[Route("upload/progress")]
+        //public IActionResult GetProressStatus()
+        //{
+        //    return Ok(Progress);
+        //}
     }
 }
