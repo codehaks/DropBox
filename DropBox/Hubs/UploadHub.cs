@@ -8,11 +8,11 @@ namespace DropBox.Hubs
 {
     public class UploadHub : Hub<IUploadHub>
     {
-        public async Task SendProgress(int progress)
-        {
+        //public async Task SendProgress(int progress)
+        //{
             
-            await Clients.All.SendProgress(progress);
-            //Clients.All.SendProgress("UpdateProgress", progress);
-        }
+        //    await Clients.All.SendProgress(progress);
+        //    //Clients.All.SendProgress("UpdateProgress", progress);
+        //}
     }
 }
