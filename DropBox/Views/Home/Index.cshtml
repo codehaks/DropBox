@@ -1,5 +1,5 @@
 ﻿@using LiteDB
-@model IEnumerable<LiteFileInfo>
+@model IEnumerable<DropBox.Models.Doc>
 @{
     ViewData["Title"] = "Index";
 }
@@ -12,8 +12,8 @@
     @foreach (var file in Model)
     {
         <tr>
-            <td><a asp-action="details" asp-route-id="@file.Id">@file.Filename</a></td>
-            <td>@(file.Length / 1024) KB</td>
+            <td><a asp-action="details" asp-route-id="@file.Id">@file.Name</a></td>
+            <td>@(file.Data.Length / 1024) KB</td>
             <td>
                 @*<a asp-action="delete" asp-route-id="@file.Id" class="btn btn-danger">Download</a>*@
                 <a asp-action="delete" asp-route-id="@file.Id" class="btn btn-danger">Delete</a>

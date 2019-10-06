@@ -1,6 +1,8 @@
 ﻿using DropBox.Common;
+using DropBox.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DropBox
@@ -17,6 +19,8 @@ namespace DropBox
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddLiteDb(_env.ContentRootPath+ "/bug.litedb");
+            services.AddDbContext<DocDbContext>(options =>
+             options.UseSqlite("DataSource=bug.db"));
             services.AddMvc();
         }
 
