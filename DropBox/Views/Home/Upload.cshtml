@@ -6,6 +6,13 @@
 <h1>Create</h1>
 <hr />
 
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success" role="alert">
+        @TempData["Message"]
+    </div>
+}
+
 <form enctype="multipart/form-data" method="post">
     <input type="file" name="file" id="file" />
     <button class="btn btn-primary" id="upload">Upload</button>
@@ -52,23 +59,6 @@
         }
 
         document.getElementById('file').addEventListener('change', handleFileSelect, false);
-
-            //$("#upload").click(function (e) {
-
-            //    var progressUpdates = setInterval(function () {
-            //        $.post("/upload/progress", function (progress) {
-            //            console.log(progress);
-            //            $("#percent").text(progress + "%");
-            //            if (progress >= 100) {
-            //                clearInterval(progressUpdates);
-            //            }
-            //        });
-            //    }, 200);
-
-
-
-            //});
-
 
 
     </script>

@@ -42,12 +42,12 @@ namespace DropBox.Controllers
         {
             if (file.Length > 0)
             {
-                using(var stream=new MemoryStream())
+                using (var stream = new MemoryStream())
                 {
                     file.CopyTo(stream);
                     stream.Position = 0;
                     _db.Context.FileStorage.Upload(file.FileName, file.FileName, stream);
-                }  
+                }
             }
             return RedirectToAction(nameof(Index));
         }
@@ -60,7 +60,7 @@ namespace DropBox.Controllers
             model.CopyTo(memory);
             memory.Position = 0;
 
-            return new FileStreamResult(memory,model.MimeType);
+            return new FileStreamResult(memory, model.MimeType);
         }
 
         [HttpGet]
@@ -70,35 +70,39 @@ namespace DropBox.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Upload(IFormFile file,[FromServices] IHostingEnvironment env)
+        public async Task<IActionResult> Upload(IFormFile file, [FromServices] IHostingEnvironment env)
         {
-            byte[] buffer = new byte[16 * 1024];
-            long totalBytes = file.Length;
-            var progress = 0;
-
             using (FileStream output = System.IO.File.Create(env.ContentRootPath + "/files/" + file.FileName))
             {
-                using (Stream input = file.OpenReadStream())
-                {
-                    long totalReadBytes = 0;
-                    int readBytes;
-
-                    while ((readBytes = input.Read(buffer, 0, buffer.Length)) > 0)
-                    {
-                        await output.WriteAsync(buffer, 0, readBytes);
-                        totalReadBytes += readBytes;
-                        progress = (int)((float)totalReadBytes / (float)totalBytes * 100.0);
-
-                        await _uploadHub.Clients.All.SendProgress(progress);
-                        
-
-                        await Task.Delay(50); // It is only to make the process slower
-                    }
-                }
+                await SaveFile(file, output);
             }
+
+            TempData["message"] = $"File [{file.FileName}] uploaded successfully.";
+
             return View();
         }
 
-      
+        private async Task SaveFile(IFormFile file, FileStream output)
+        {
+            byte[] buffer = new byte[16 * 1024];
+            long totalBytes = file.Length;
+
+            using (Stream input = file.OpenReadStream())
+            {
+                long totalReadBytes = 0;
+                int readBytes;
+
+                while ((readBytes = input.Read(buffer, 0, buffer.Length)) > 0)
+                {
+                    await output.WriteAsync(buffer, 0, readBytes);
+                    totalReadBytes += readBytes;
+                    int progress = (int)((float)totalReadBytes / (float)totalBytes * 100.0);
+                    await _uploadHub.Clients.All.SendProgress(progress);
+                    await Task.Delay(50); // It is only to make the process slower
+                }
+            }
+
+        }
+
     }
 }
