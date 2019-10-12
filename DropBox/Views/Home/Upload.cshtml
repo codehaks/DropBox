@@ -7,30 +7,30 @@
 <hr />
 
 @*@{
-    var fileList = (List<string>)TempData["message"];
+        var fileList = (List<string>)TempData["message"];
 
-    if (fileList != null)
-    {
-        foreach (var fileName in fileList)
+        if (fileList != null)
         {
-            <div class="alert alert-success" role="alert">
-                [@fileName] uploaded successfully
-            </div>
+            foreach (var fileName in fileList)
+            {
+                <div class="alert alert-success" role="alert">
+                    [@fileName] uploaded successfully
+                </div>
+            }
         }
-    }
-}*@
+    }*@
 
 <div id="app">
 
-    <form enctype="multipart/form-data" method="post">
+    <form id="uploadform" enctype="multipart/form-data" method="post" v-on:submit.prevent="upload">
         <input type="file" name="files" id="file" ref="uploads" multiple v-on:change="fileSelected" />
-        <button class="btn btn-primary" id="upload">Upload</button>
+        <button class="btn btn-primary" id="upload" type="submit">Upload</button>
     </form>
 
     <br />
 
 
-    <div class="card bg-primary"  v-show="!(fileList <= 0)">
+    <div class="card bg-primary" v-show="!(fileList <= 0)">
         <div class="card-header">
             Upload
         </div>
@@ -73,6 +73,19 @@
                 connection: null
             },
             methods: {
+                upload: function () {
+                
+
+                    $.ajax({
+                        url: '/api/upload',
+                        type: 'post',
+                        data: $('#uploadform').serialize(),
+                        success: function () {
+                            alert("Done!");
+                        }
+                    });
+
+                },
                 fileSelected: function () {
                     var vm = this;
 

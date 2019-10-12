@@ -65,13 +65,15 @@ namespace DropBox.Controllers
         }
 
         [HttpGet]
+        [Route("home/upload")]
         public IActionResult Upload()
         {
             return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> Upload(IEnumerable<IFormFile> files,
+        [Route("api/upload")]
+        public async Task<IActionResult> UploadAll(IEnumerable<IFormFile> files,
             [FromServices] IHostingEnvironment env,
             CancellationToken cancellationToken)
         {
@@ -86,11 +88,7 @@ namespace DropBox.Controllers
 
             var results=await Task.WhenAll(uploadTaskList);
 
-
-
-            TempData["message"] = results;
-
-            return View();
+            return Ok();
         }
 
         private async Task<string> SaveFile(IFormFile file, IHostingEnvironment env)
