@@ -30,7 +30,7 @@
     <br />
 
 
-    <div class="card bg-primary"  v-show="!(fileList <= 0)">
+    <div class="card bg-primary"  v-show="fileList.length >0 ">
         <div class="card-header">
             Upload
         </div>
@@ -40,6 +40,8 @@
                 <strong>
                     {{(file.size/(1024*1024)) | roundme}}  MB
                 </strong>
+
+                <span v-show="file.progress>0 " class="ml-5">{{file.progress}}%</span>
                 <div class="progress">
                     <div id="progressbar" class="progress-bar" v-bind:style="{width: file.progress+ '%'}" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
