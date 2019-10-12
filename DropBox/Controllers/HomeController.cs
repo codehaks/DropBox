@@ -75,38 +75,46 @@ namespace DropBox.Controllers
             [FromServices] IHostingEnvironment env,
             CancellationToken cancellationToken)
         {
+
+            var uploadTaskList = new List<Task>();
             foreach (var file in files)
             {
-                using (FileStream output = System.IO.File.Create(env.ContentRootPath + "/files/" + file.FileName))
-                {
-                    await SaveFile(file, output);
-                }
-
-                TempData["message"] = $"File [{file.FileName}] uploaded successfully.";
+                var uploadTask = SaveFile(file,env);
+                uploadTaskList.Add(uploadTask);
 
             }
+
+            await Task.WhenAll(uploadTaskList);
+
+            TempData["message"] = $"all files uploaded successfully.";
 
             return View();
         }
 
-        private async Task SaveFile(IFormFile file, FileStream output)
+        private async Task SaveFile(IFormFile file, IHostingEnvironment env)
         {
-            byte[] buffer = new byte[16 * 1024];
-            long totalBytes = file.Length;
-
-            using (Stream input = file.OpenReadStream())
+            using (FileStream output = System.IO.File.Create(env.ContentRootPath + "/files/" + file.FileName))
             {
-                long totalReadBytes = 0;
-                int readBytes;
 
-                while ((readBytes = input.Read(buffer, 0, buffer.Length)) > 0)
+
+                byte[] buffer = new byte[16 * 1024];
+                long totalBytes = file.Length;
+
+                using (Stream input = file.OpenReadStream())
                 {
-                    await output.WriteAsync(buffer, 0, readBytes);
-                    totalReadBytes += readBytes;
-                    int progress = (int)((float)totalReadBytes / (float)totalBytes * 100.0);
-                    await _uploadHub.Clients.All.SendProgress(file.FileName, progress);
-                    await Task.Delay(50); // It is only to make the process slower
+                    long totalReadBytes = 0;
+                    int readBytes;
+
+                    while ((readBytes = input.Read(buffer, 0, buffer.Length)) > 0)
+                    {
+                        await output.WriteAsync(buffer, 0, readBytes);
+                        totalReadBytes += readBytes;
+                        int progress = (int)((float)totalReadBytes / (float)totalBytes * 100.0);
+                        await _uploadHub.Clients.All.SendProgress(file.FileName, progress);
+                        await Task.Delay(50); // It is only to make the process slower
+                    }
                 }
+
             }
 
         }
