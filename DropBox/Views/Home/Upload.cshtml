@@ -3,15 +3,22 @@
     ViewData["Title"] = "Create";
 }
 
-<h1>Create</h1>
+<h1>Upload multiple files</h1>
 <hr />
 
-@if (TempData["Message"] != null)
-{
-    <div class="alert alert-success" role="alert">
-        @TempData["Message"]
-    </div>
-}
+@*@{
+    var fileList = (List<string>)TempData["message"];
+
+    if (fileList != null)
+    {
+        foreach (var fileName in fileList)
+        {
+            <div class="alert alert-success" role="alert">
+                [@fileName] uploaded successfully
+            </div>
+        }
+    }
+}*@
 
 <div id="app">
 
@@ -20,9 +27,10 @@
         <button class="btn btn-primary" id="upload">Upload</button>
     </form>
 
+    <br />
 
 
-    <div class="card">
+    <div class="card bg-primary"  v-show="!(fileList <= 0)">
         <div class="card-header">
             Upload
         </div>
@@ -104,13 +112,13 @@
                         vm.fileList[fileIndex].progress = progress;
                     } else {
                         console.log("Not found : " + fileName);
-                    }                    
-                    
+                    }
+
                 });
             }
         });
 
     </script>
 
-   
+
 }

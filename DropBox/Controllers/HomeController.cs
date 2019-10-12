@@ -76,7 +76,7 @@ namespace DropBox.Controllers
             CancellationToken cancellationToken)
         {
 
-            var uploadTaskList = new List<Task>();
+            var uploadTaskList = new List<Task<string>>();
             foreach (var file in files)
             {
                 var uploadTask = SaveFile(file,env);
@@ -84,14 +84,16 @@ namespace DropBox.Controllers
 
             }
 
-            await Task.WhenAll(uploadTaskList);
+            var results=await Task.WhenAll(uploadTaskList);
 
-            TempData["message"] = $"all files uploaded successfully.";
+
+
+            TempData["message"] = results;
 
             return View();
         }
 
-        private async Task SaveFile(IFormFile file, IHostingEnvironment env)
+        private async Task<string> SaveFile(IFormFile file, IHostingEnvironment env)
         {
             using (FileStream output = System.IO.File.Create(env.ContentRootPath + "/files/" + file.FileName))
             {
@@ -116,6 +118,8 @@ namespace DropBox.Controllers
                 }
 
             }
+
+            return file.FileName;
 
         }
 
