@@ -72,23 +72,24 @@ namespace DropBox.Controllers
 
         [HttpPost]
         public async Task<IActionResult> Upload(IEnumerable<IFormFile> files,
-            [FromServices] IHostingEnvironment env,
-            CancellationToken cancellationToken)
+            [FromServices] IHostingEnvironment env, CancellationToken cancellationToken)
         {
 
             var uploadTaskList = new List<Task<string>>();
+
+            var totalUploadSize = 0D;
+
             foreach (var file in files)
             {
-                var uploadTask = SaveFile(file,env);
+                totalUploadSize += file.Length;
+                var uploadTask = SaveFile(file, env);
                 uploadTaskList.Add(uploadTask);
 
             }
 
-            var results=await Task.WhenAll(uploadTaskList);
+            await Task.WhenAll(uploadTaskList);
 
-
-
-            TempData["message"] = results;
+            TempData["message"] = $"{files.Count()} files uploaded with the total size of {Math.Round(totalUploadSize/(1024*1024),2)} MB.";
 
             return View();
         }

@@ -6,19 +6,13 @@
 <h1>Upload multiple files</h1>
 <hr />
 
-@*@{
-    var fileList = (List<string>)TempData["message"];
+@if (TempData["message"] != null)
+{
+    <div class="alert alert-success" role="alert">
+        @TempData["message"]
+    </div>
+}
 
-    if (fileList != null)
-    {
-        foreach (var fileName in fileList)
-        {
-            <div class="alert alert-success" role="alert">
-                [@fileName] uploaded successfully
-            </div>
-        }
-    }
-}*@
 
 <div id="app">
 
@@ -30,7 +24,7 @@
     <br />
 
 
-    <div class="card bg-primary"  v-show="fileList.length >0 ">
+    <div class="card bg-primary" v-show="fileList.length >0 ">
         <div class="card-header">
             Upload
         </div>
