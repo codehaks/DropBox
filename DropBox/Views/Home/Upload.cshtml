@@ -13,53 +13,104 @@
     </div>
 }
 
-<form enctype="multipart/form-data" method="post">
-    <input type="file" name="file" id="file" />
-    <button class="btn btn-primary" id="upload">Upload</button>
-</form>
+<div id="app">
 
-<output id="list"></output>
+    <form enctype="multipart/form-data" method="post">
+        <input type="file" name="files" id="file" ref="uploads" multiple v-on:change="fileSelected" />
+        <button class="btn btn-primary" id="upload">Upload</button>
+    </form>
 
-<h2 id="percent">0%</h2>
 
-<div class="progress">
-    <div id="progressbar" class="progress-bar" style="width: 0%" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+
+    <div class="card">
+        <div class="card-header">
+            Upload
+        </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item" v-for="(file) in fileList">
+                {{file.name}} |
+                <strong>
+                    {{(file.size/(1024*1024)) | roundme}}  MB
+                </strong>
+                <div class="progress">
+                    <div id="progressbar" class="progress-bar" v-bind:style="{width: file.progress+ '%'}" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+            </li>
+
+        </ul>
+    </div>
 </div>
 
 @section scripts{
     <script src="~/lib/signalr/dist/browser/signalr.js"></script>
+    <script src="~/lib/vue/vue.js"></script>
+    <script src="~/lib/lodash.js/lodash.js"></script>
 
     <script>
-        var connection = new signalR.HubConnectionBuilder()
-            .withUrl('/UploadHub')
-            .configureLogging(signalR.LogLevel.Information)
-            .build();
-        this.connection.start()
-            .catch(function (err) {
-                return console.error(err.toSting());
-            });
 
-        connection.on('sendProgress', function (progress) {
-            $("#percent").text(progress + "%");
-            $("#progressbar").css("width", progress + "%");
-        });
-    </script>
-    <script>
-        var files = null;
-
-        function handleFileSelect(evt) {
-            files = evt.target.files; // FileList object
-
-            var output = [];
-            for (var i = 0, f; f = files[i]; i++) {
-                output.push('<li><strong>', escape(f.name), '</strong> (', f.type || 'n/a', ') - ',
-                    f.size, ' bytes </li>');
+        Vue.filter('roundme', function (value) {
+            if (!value) return ''
+            try {
+                return Math.round(10 * value) / 10;
+            } catch (e) {
+                return "0.0";
             }
-            document.getElementById('list').innerHTML = '<ul>' + output.join('') + '</ul>';
-        }
 
-        document.getElementById('file').addEventListener('change', handleFileSelect, false);
+        })
 
+        var app = new Vue({
+            el: "#app",
+            data: {
+                fileList: [],
+                connection: null
+            },
+            methods: {
+                fileSelected: function () {
+                    var vm = this;
+
+                    var selectedfiles = this.$refs.uploads.files;
+
+                    for (var i = 0; i < selectedfiles.length; i++) {
+
+                        var file = {
+                            name: selectedfiles[i].name,
+                            size: selectedfiles[i].size,
+                            progress: 0
+                        }
+
+                        vm.fileList.push(file);
+                    }
+
+
+                }
+            },
+            mounted: function () {
+                var vm = this;
+
+                vm.connection = new signalR.HubConnectionBuilder()
+                    .withUrl('/UploadHub')
+                    .configureLogging(signalR.LogLevel.Information)
+                    .build();
+
+                vm.connection.start()
+                    .catch(function (err) {
+                        return console.error(err.toSting());
+                    });
+
+                vm.connection.on('sendProgress', function (fileName, progress) {
+
+                    var fileIndex = _.findIndex(vm.fileList, function (o) { return o.name == fileName; });
+                    if (fileIndex >= 0) {
+                        vm.fileList[fileIndex].progress = progress;
+                    } else {
+                        console.log("Not found : " + fileName);
+                    }                    
+                    
+                });
+            }
+        });
 
     </script>
+
+   
 }

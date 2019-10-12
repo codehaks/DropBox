@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using DropBox.Common;
 using DropBox.Hubs;
@@ -70,14 +71,20 @@ namespace DropBox.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Upload(IFormFile file, [FromServices] IHostingEnvironment env)
+        public async Task<IActionResult> Upload(IEnumerable<IFormFile> files,
+            [FromServices] IHostingEnvironment env,
+            CancellationToken cancellationToken)
         {
-            using (FileStream output = System.IO.File.Create(env.ContentRootPath + "/files/" + file.FileName))
+            foreach (var file in files)
             {
-                await SaveFile(file, output);
-            }
+                using (FileStream output = System.IO.File.Create(env.ContentRootPath + "/files/" + file.FileName))
+                {
+                    await SaveFile(file, output);
+                }
 
-            TempData["message"] = $"File [{file.FileName}] uploaded successfully.";
+                TempData["message"] = $"File [{file.FileName}] uploaded successfully.";
+
+            }
 
             return View();
         }
@@ -97,7 +104,7 @@ namespace DropBox.Controllers
                     await output.WriteAsync(buffer, 0, readBytes);
                     totalReadBytes += readBytes;
                     int progress = (int)((float)totalReadBytes / (float)totalBytes * 100.0);
-                    await _uploadHub.Clients.All.SendProgress(progress);
+                    await _uploadHub.Clients.All.SendProgress(file.FileName, progress);
                     await Task.Delay(50); // It is only to make the process slower
                 }
             }

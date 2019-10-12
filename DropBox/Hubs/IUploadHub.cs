@@ -4,6 +4,6 @@ namespace DropBox.Hubs
 {
     public interface IUploadHub
     {
-        Task SendProgress(int progress);
+        Task SendProgress(string fileName,int progress);
     }
 }
