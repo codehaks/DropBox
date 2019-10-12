@@ -100,7 +100,8 @@ namespace DropBox.Controllers
             {
 
 
-                byte[] buffer = new byte[16 * 1024];
+                byte[] buffer = new byte[file.Length/100];
+
                 long totalBytes = file.Length;
 
                 using (Stream input = file.OpenReadStream())
