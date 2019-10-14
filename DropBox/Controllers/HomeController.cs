@@ -105,7 +105,7 @@ namespace DropBox.Controllers
                     totalReadBytes += readBytes;
                     int progress = (int)((float)totalReadBytes / (float)totalBytes * 100.0);
                     await _uploadHub.Clients.All.SendProgress(file.FileName, progress);
-                    await Task.Delay(50); // It is only to make the process slower
+                    await Task.Delay(5); // It is only to make the process slower
                 }
             }
 
